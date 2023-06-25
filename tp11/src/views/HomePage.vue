@@ -39,7 +39,7 @@
       <div class="box" v-for="product in products" :key="product">
         <img src="../../public/img.png" />
         <h3>{{ product.product_name }}</h3>
-        <p>{{ product.description }}</p>
+        <p>{{ product.price }}</p>
       </div>
     </div>
   </main>
