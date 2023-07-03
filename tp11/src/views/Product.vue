@@ -40,6 +40,11 @@
     </div>
     <div class="adding" id="add">
       <h2>Add new Product</h2>
+      <div class="image_field">
+        <input type="file" @change=handle_image />
+        <img v-if="priviewImage" :src="priviewImage" alt="preview" />
+        <img v-if="priviewImage === null" :src="'../../public/image.png'">
+      </div>
       <div class="input-field">
         <input v-model="product_name" type="text" placeholder="Product name">
         <input v-model="image" type="text" placeholder="Image">
@@ -54,6 +59,11 @@
     </div>
     <div class="adding" id="edit">
       <h2>Add new Category</h2>
+      <div class="image_field">
+        <input type="file" @change=handle_image />
+        <!-- <img v-if="priviewImage" :src="priviewImage" alt="preview" /> -->
+        <img src="../../public/image.png">
+      </div>
       <div class="input-field">
         <input v-model="product_name" type="text" placeholder="Product name">
         <input v-model="image" type="text" placeholder="Image">
@@ -70,6 +80,34 @@
 </template>
 
 <style>
+
+.image_field{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  position: relative;
+}
+
+.image_field input{
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  height: fit-content;
+  outline: none;
+  opacity: 0;
+}
+
+.image_field img{
+  border: 2px solid black;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -150,7 +188,7 @@ main .adding{
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%,-80%);
+  transform: translate(-50%,-50%);
   display: none;
   flex-direction: column;
   padding: 20px;
@@ -191,6 +229,7 @@ export default {
     return {
       product_name: '',
       image: '',
+      priviewImage: null,
       sub_id: '',
       description: '',
       price: '',
@@ -201,8 +240,12 @@ export default {
   methods: {
     redirect(path){
       this.$router.push(path)
-    }
-    ,
+    },
+    handle_image(e){
+      const file = e.target.files[0]
+      this.priviewImage = URL.createObjectURL(file)
+      this.image = file.name
+    },
     open_subcategory (){
       document.getElementById('add').style.display = "flex"
     },
@@ -223,13 +266,25 @@ export default {
     },
     add_new(){
       const data = {
-          _id: _id,
           product_name: this.product_name,
           product_image: this.image,
           sub_category_id: this.sub_id,
           description: this.description,
           price: this.price
         }
+
+      const formData = new FormData();
+      formData.append("image", this.priviewImage);
+
+      axios
+        .post("http://localhost:3000/api/v1/image/test_image", formData)
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      
       axios.post('http://localhost:3000/api/v1/product/create_product', data)
         .then((response) => {
           if(response.status === 200){
